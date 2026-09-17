@@ -62,7 +62,10 @@ export default function SignInScreen() {
         return;
       }
 
-      if (signIn.status === "needs_second_factor") {
+      if (
+        signIn.status === "needs_second_factor" ||
+        signIn.status === "needs_client_trust"
+      ) {
         const supported = signIn.supportedSecondFactors || [];
         const phoneFactor = supported.find((f) => f.strategy === "phone_code");
         const emailFactor = supported.find((f) => f.strategy === "email_code");
@@ -202,10 +205,10 @@ export default function SignInScreen() {
                 ? mfaStrategy === "totp"
                   ? "Enter the code from your authenticator app"
                   : mfaStrategy === "phone_code"
-                  ? "Enter the verification code sent to your phone"
-                  : mfaStrategy === "email_code"
-                  ? "Enter the verification code sent to your email"
-                  : "Enter your verification or backup code"
+                    ? "Enter the verification code sent to your phone"
+                    : mfaStrategy === "email_code"
+                      ? "Enter the verification code sent to your email"
+                      : "Enter your verification or backup code"
                 : "Sign in to continue managing your subscriptions"
             }
           />
@@ -301,7 +304,9 @@ export default function SignInScreen() {
                         setMfaCode(text);
                         if (errorMessage) setErrorMessage("");
                       }}
-                      keyboardType="number-pad"
+                      keyboardType={
+                        mfaStrategy === "backup_code" ? "default" : "number-pad"
+                      }
                       editable={!loading}
                     />
                   </View>
