@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { styled } from "nativewind";
 import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, ScrollView, Text } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, Text } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView);
@@ -52,8 +52,14 @@ export default function Settings() {
       setIsSigningOut(true);
       await signOut();
       router.replace("/(auth)/sign-in");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing out:", error);
+      const errorMessage =
+        error?.errors?.[0]?.longMessage ||
+        error?.errors?.[0]?.message ||
+        error?.message ||
+        "An error occurred while signing out. Please try again.";
+      Alert.alert("Sign Out Failed", errorMessage);
     } finally {
       setIsSigningOut(false);
     }

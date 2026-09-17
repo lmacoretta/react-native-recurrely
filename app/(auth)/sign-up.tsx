@@ -82,13 +82,30 @@ export default function SignUpScreen() {
         return;
       }
 
-      const { error: finalizeError } = await signUp.finalize();
-      if (finalizeError) {
-        setErrorMessage(finalizeError.message || "Failed to finalize session.");
-        return;
-      }
+      if (signUp.status === "complete") {
+        const { error: finalizeError } = await signUp.finalize();
+        if (finalizeError) {
+          setErrorMessage(finalizeError.message || "Failed to finalize session.");
+          return;
+        }
 
-      router.replace("/(tabs)");
+        router.replace("/(tabs)");
+      } else if (signUp.status === "missing_requirements") {
+        const missingFields = signUp.missingFields || [];
+        const unverified = signUp.unverifiedFields || [];
+        const missingList = [
+          ...missingFields,
+          ...unverified.map((field) => `verify ${field}`),
+        ];
+
+        const details =
+          missingList.length > 0 ? missingList.join(", ") : "missing required fields";
+        setErrorMessage(
+          `Account setup requires additional information: ${details}.`
+        );
+      } else {
+        setErrorMessage(`Sign up cannot be completed (status: ${signUp.status}).`);
+      }
     } catch (err: any) {
       setErrorMessage(err?.message || "Invalid code. Please try again.");
     } finally {
@@ -127,6 +144,7 @@ export default function SignUpScreen() {
           {/* Form Card */}
           <View className="auth-card">
             <View className="auth-form">
+              <View nativeID="clerk-captcha" />
               {!isVerifying ? (
                 <>
                   {/* Email Field */}

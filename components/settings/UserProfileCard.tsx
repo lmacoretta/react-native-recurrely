@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
 
 interface UserProfileCardProps {
@@ -13,6 +13,10 @@ const UserProfileCard = memo(function UserProfileCard({
   imageUrl,
 }: UserProfileCardProps) {
   const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [imageUrl]);
 
   const initial = name?.trim() ? name.trim().charAt(0).toUpperCase() : "U";
 
